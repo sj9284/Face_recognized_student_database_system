@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX - Smart Attendance System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Remove this line from the head section -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/face-api.js/0.22.2/face-api.min.js"></script> -->
+</head>
+<body>
+    <div class="app-container">
+        <!-- Auth Container -->
+        <div class="container" id="auth-container">
+            <div class="forms-container">
+                <div class="signin-signup">
+                    <form action="#" class="sign-in-form">
+                        <h2 class="title">Sign In</h2>
+                        <div class="input-field">
+                            <i class="fas fa-user"></i>
+                            <input type="text" placeholder="Username" id="login-username" required>
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Password" id="login-password" required>
+                        </div>
+                        <input type="submit" value="Login" class="btn solid" id="login-button">
+                    </form>
+
+                    <form action="#" class="sign-up-form">
+                        <h2 class="title">Sign Up</h2>
+                        <div class="input-field">
+                            <i class="fas fa-user"></i>
+                            <input type="text" placeholder="Username" id="register-username" required>
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" placeholder="Email" id="register-email" required>
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Password" id="register-password" required>
+                        </div>
+                        <input type="submit" value="Sign Up" class="btn solid" id="register-button">
+                    </form>
+                </div>
+            </div>
+
+            <div class="panels-container">
+                <div class="panel left-panel">
+                    <div class="content">
+                        <h3>New here?</h3>
+                        <p>Register now and start tracking your attendance with our cutting-edge face recognition system!</p>
+                        <button class="btn transparent" id="sign-up-btn">Sign Up</button>
+                    </div>
+                    <!-- Removed image -->
+                </div>
+
+                <div class="panel right-panel">
+                    <div class="content">
+                        <h3>One of us?</h3>
+                        <p>Log in and continue your journey with us!</p>
+                        <button class="btn transparent" id="sign-in-btn">Sign In</button>
+                    </div>
+                    <!-- Removed image -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Container -->
+        <div class="dashboard-container" id="dashboard-container" style="display: none;">
+            <nav class="dashboard-nav">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <h2>AttendX</h2>
+                </div>
+                <ul class="nav-links">
+                    <li class="nav-link active" data-tab="home"><i class="fas fa-home"></i> <span>Home</span></li>
+                    <li class="nav-link" data-tab="attendance"><i class="fas fa-calendar-check"></i> <span>Attendance</span></li>
+                    <li class="nav-link" data-tab="courses"><i class="fas fa-book"></i> <span>Courses</span></li>
+                    <li class="nav-link" data-tab="profile"><i class="fas fa-user-circle"></i> <span>Profile</span></li>
+                </ul>
+                <div class="logout">
+                    <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+                </div>
+            </nav>
+
+            <main class="dashboard-content">
+                <!-- Home Tab -->
+                <section class="tab-content active" id="home-tab">
+                    <div class="welcome-section">
+                        <h1>Welcome, <span id="user-name">User</span>!</h1>
+                        <p class="date-display">Today is <span id="current-date"></span></p>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <div class="stat-info">
+                                <h3>Attendance Rate</h3>
+                                <p id="attendance-rate">0%</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-book"></i>
+                            <div class="stat-info">
+                                <h3>Courses</h3>
+                                <p id="courses-count">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-user-check"></i>
+                            <div class="stat-info">
+                                <h3>Last Check-in</h3>
+                                <p id="last-checkin">Never</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="face-scan-container">
+                        <h2>Take Attendance</h2>
+                        <p>Use your webcam to mark your attendance for today</p>
+                        
+                        <div class="video-container">
+                            <video id="video" width="480" height="360" autoplay muted playsinline></video>
+                            <canvas id="canvas" width="480" height="360"></canvas>
+                            <div class="scan-overlay">
+                                <div class="scan-line"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="controls">
+                            <button id="start-camera" class="btn"><i class="fas fa-camera"></i> Start Camera</button>
+                            <button id="take-attendance" class="btn primary" disabled><i class="fas fa-check-circle"></i> Mark Attendance</button>
+                        </div>
+                        
+                        <div id="scan-status" class="scan-status"></div>
+                    </div>
+                </section>
+
+                <!-- Attendance Tab -->
+                <section class="tab-content" id="attendance-tab">
+                    <h1>Attendance History</h1>
+                    
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="month-filter">Filter by Month:</label>
+                            <select id="month-filter">
+                                <option value="all">All Months</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="attendance-table-container">
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- Attendance records will be displayed here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="no-attendance" class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No attendance records found.</p>
+                    </div>
+                </section>
+
+                <!-- Courses Tab -->
+                <section class="tab-content" id="courses-tab">
+                    <h1>Course Management</h1>
+                    
+                    <div class="add-course-form">
+                        <h2>Add New Course</h2>
+                        <form id="add-course-form">
+                            <div class="form-group">
+                                <label for="course-name">Course Name</label>
+                                <input type="text" id="course-name" placeholder="Enter course name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="course-code">Course Code</label>
+                                <input type="text" id="course-code" placeholder="Enter course code" required>
+                            </div>
+                            <button type="submit" class="btn primary"><i class="fas fa-plus"></i> Add Course</button>
+                        </form>
+                    </div>
+
+                    <div class="courses-list">
+                        <h2>Enrolled Courses</h2>
+                        <div class="course-cards" id="course-cards">
+                            <!-- Course cards will be displayed here -->
+                        </div>
+                        <div id="no-courses" class="empty-state">
+                            <i class="fas fa-book"></i>
+                            <p>No courses added yet.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Profile Tab -->
+                <section class="tab-content" id="profile-tab">
+                    <h1>User Profile</h1>
+                    
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h2 id="profile-username">Username</h2>
+                            <p id="profile-email">user@example.com</p>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <h3>Attendance Rate</h3>
+                                <p id="profile-attendance-rate">0%</p>
+                            </div>
+                            <div class="profile-stat">
+                                <h3>Total Courses</h3>
+                                <p id="profile-courses-count">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <p class="notification-message"></p>
+        </div>
+    </div>
+
+    <!-- Add this before the closing body tag -->
+     <!-- Add these before the closing body tag -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/camera.js"></script>
+<script src="/js/dashboard.js"></script>
+
+<!-- Add a notification container -->
+<div id="notification-container"></div>
+    <!-- Removed duplicate script tags for auth.js and camera.js -->
+</body>
+</html>
